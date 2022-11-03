@@ -1,0 +1,2 @@
+model_checkpoint_path: "weight.h5f"
+all_model_checkpoint_paths: "weight.h5f"
