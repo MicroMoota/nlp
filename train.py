@@ -27,19 +27,18 @@ class ChatRobot:
         self.debug = debug
 
     def preHandleData(self):
-        if not os.path.exists("train.json"):
+        if not os.path.exists("minTrain.json"):
             raise BaseException("不存在训练数据")
         else:
-            with open('train.json', "r") as file:
+            with open('minTrain.json', "r") as file:
                 self.intents = json.load(file)
 
         for intent in self.intents['intents']:
-            for pattern in intent['patterns']:
+            for k,pattern in enumerate(intent['patterns']):
                 w = nltk.word_tokenize(pattern)
                 self.words.extend(w)
-                self.documents.append((w, intent['tag']))
-                if intent['tag'] not in self.tags:
-                    self.tags.append(intent['tag'])
+                self.documents.append((w, k))
+                self.tags.append(k)
 
         self.words = [self.stemmer.stem(w.lower()) for w in self.words if w not in self.ignoreWords]
         self.words = sorted(list(set(self.words)))
@@ -119,11 +118,7 @@ class ChatRobot:
         results = []
         for r in predicts:
             results.append((self.tags[r[0]], str(r[1])))
-        result = ""
-        for intent in self.intents['intents']:
-            if intent['tag'] == results[0][0]:
-                result = random.choice(intent['responses'])
-                break
+        result = random.choice(self.intents['intents'][results[0][0]]['responses'])
         return result
 
 
